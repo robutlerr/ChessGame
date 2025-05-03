@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 3
+  tags:
+  - Board
+  - King
+  - Queen
+  - Bishop
+  - Knight
+  - Rook
+  - Pawn
+  - MovePlate
+  - WinnerText
+  - RestartText
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - Board
+  - MovePlate
+  - Pieces
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Board
+    uniqueID: 2744259665
+    locked: 0
+  - name: MovePlate
+    uniqueID: 2537587407
+    locked: 0
+  - name: Pieces
+    uniqueID: 428571975
+    locked: 0
+  m_RenderingLayers:
+  - Default
