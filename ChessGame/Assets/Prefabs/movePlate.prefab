@@ -148,4 +148,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GameManager: {fileID: 0}
+  capturedIconPrefab: {fileID: 5801723818976337556, guid: bdb412ae2d8e624429d8a171365c1ce3, type: 3}
+  whiteCapturedContainer: {fileID: 0}
+  blackCapturedContainer: {fileID: 0}
   attack: 0

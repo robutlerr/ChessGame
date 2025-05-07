@@ -103,6 +103,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gm: {fileID: 0}
   movePlate: {fileID: 110785124453051260, guid: 2e5533fcd0aca7f4bb81fcde2c5ce8e4, type: 3}
+  capturedIconPrefab: {fileID: 5801723818976337556, guid: bdb412ae2d8e624429d8a171365c1ce3, type: 3}
+  whiteCapturedContainer: {fileID: 0}
+  blackCapturedContainer: {fileID: 0}
+  hasMoved: 0
   black_queen: {fileID: -2628853326628446179, guid: 6137af0b9a9397d479fcf4b0ff0fb329, type: 3}
   black_knight: {fileID: -334450713805299198, guid: 389cadcf7f9202748b2119ee76f01a21, type: 3}
   black_bishop: {fileID: -6414592721767173361, guid: d63254e80a816ee41874a4d64cc1b5ec, type: 3}
@@ -159,5 +163,5 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 2, y: 2}
+  m_Size: {x: 0.2, y: 0.25}
   m_EdgeRadius: 0

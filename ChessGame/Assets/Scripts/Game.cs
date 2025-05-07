@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 public class Game : MonoBehaviour
 {
@@ -20,10 +21,14 @@ public class Game : MonoBehaviour
     // can turn into an int variable if needed
     private string currentPlayer = "white";
     private bool gameOver = false;
-
+    
+    public TMP_Text CheckText;
     // variables for the end game text
     public TMP_Text WinnerText;
     public TMP_Text RestartText;
+    public TMP_Text WhitePlayerText;
+    public TMP_Text BlackPlayerText;    
+
 
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -52,6 +57,9 @@ public class Game : MonoBehaviour
         gameOver = false;
         // sets the first player to White
         currentPlayer = "white";
+        BlackPlayerText.gameObject.SetActive(false);
+        // show the current player as white
+        WhitePlayerText.gameObject.SetActive(true);
         // array of white's pieces
         playerWhite = new GameObject[] {
             Create("white_rook", 0, 0),
@@ -139,18 +147,169 @@ public class Game : MonoBehaviour
     }
 
     public void NextTurn() {
-        if (currentPlayer == "white") {
-            currentPlayer = "black";
-        } else {
-            currentPlayer = "white";
+        // only process the next turn if the game is still actively going
+        if (gameOver == false) {
+            if (currentPlayer == "white") {
+                currentPlayer = "black";
+
+                WhitePlayerText.gameObject.SetActive(false);
+                // show the current player as black
+                BlackPlayerText.gameObject.SetActive(true);
+            } else {
+                currentPlayer = "white";
+
+                BlackPlayerText.gameObject.SetActive(false);
+                // show the current player as white
+                WhitePlayerText.gameObject.SetActive(true);
+            }
+
+            if (IsKingInCheck(currentPlayer)) {
+                // activating the text to show the check
+                CheckText.text = $"{currentPlayer.ToUpper()} KING IS IN CHECK!";
+                CheckText.gameObject.SetActive(true);
+                Debug.Log(currentPlayer + " king is in CHECK!");
+            }
         }
     }
 
+    public GameObject FindKing(string color) {
+        GameObject[] pieces = (color == "white") ? playerWhite : playerBlack;
+
+        // find the king in the array
+        foreach (GameObject piece in pieces)
+        {
+            if (piece != null && piece.name == color + "_king")
+            {
+                // if found, return the GameObject
+                return piece;
+            }
+        }
+
+        return null;
+
+    }
+
+    public bool IsKingInCheck(string playerColor) {
+        string enemyColor = "";
+        // setting the enemy color based on the player
+        if (playerColor == "white") {
+            enemyColor = "black";
+        } else if (playerColor == "black") {
+            enemyColor = "white";
+        }
+
+        Debug.Log("Checking if enemy king is in check: " + enemyColor);
+
+        // find the position of the current playerKing
+        GameObject king = FindKing(playerColor);
+        if (king == null) {
+            Debug.Log("No king (NULL)");
+            return false;
+        }
+
+        Vector2Int kingPosition = new Vector2Int (king.GetComponent<GameManager>().getXBoard(),
+                                            king.GetComponent<GameManager>().getYBoard());
+
+
+
+        GameObject[] enemyPieces = (enemyColor == "white") ? playerWhite : playerBlack;
+
+        foreach (GameObject piece in enemyPieces)
+        {
+            if (piece == null) continue;
+
+            GameManager gm = piece.GetComponent<GameManager>();
+            List<Vector2Int> possibleMoves = gm.GetAttackMoves(true);
+
+            // debugging
+            foreach (Vector2Int m in possibleMoves)
+            {
+                if (m == kingPosition)
+                {
+                    Debug.Log(piece.name + " CAN attack king at: " + kingPosition);
+                    return true;
+                }
+                else
+                {
+                    Debug.Log(piece.name + " CANNOT attack king. King is at: " + kingPosition);
+                }
+                Debug.Log(piece.name + " threatens: " + m);
+            }
+
+            if (possibleMoves.Contains(kingPosition))
+            {
+                // if the enemy piece can attack the king, or attack the king if the king moves into that square, the king is in check
+                return true;
+            }
+        }
+        // deactivate the text if it is active
+        CheckText.gameObject.SetActive(false);
+        // the king isn't in check
+        return false;
+
+    }
+
+    public bool IsKingInCheckmate(string playerColor) {
+        Debug.Log("Checking legal moves for: " + playerColor);
+        GameObject[] playerPieces = (playerColor == "white") ? playerWhite : playerBlack;
+
+        foreach (GameObject piece in playerPieces)
+        {
+            if (piece == null) continue;
+
+            GameManager gm = piece.GetComponent<GameManager>();
+            List<Vector2Int> possibleMoves = gm.GetAttackMoves(false);
+
+            foreach (Vector2Int move in possibleMoves)
+            {
+                // save the original/real piece location on board
+                int originalX = gm.getXBoard();
+                int originalY = gm.getYBoard();
+                GameObject[,] originalBoard = (GameObject[,])positions.Clone();
+                GameObject captured = GetPosition(move.x, move.y);
+
+                // simulate the move
+                SetPositionEmpty(originalX, originalY);
+                positions[move.x, move.y] = piece;
+                gm.setXBoard(move.x);
+                gm.setYBoard(move.y);
+
+                bool stillInCheck = IsKingInCheck(playerColor);
+
+                // undo the simulated test move
+                positions = originalBoard;
+                gm.setXBoard(originalX);
+                gm.setYBoard(originalY);
+
+                if (!stillInCheck) {
+                    Debug.Log(piece.name + " can prevent checkmate by moving to " + move);
+                    return false; // found a legal move or legal escape 
+                }
+                
+            }
+        }
+
+        // no escape moves from check found
+        return true;
+
+    }
+
     public void Winner(string playerWinner) {
+        // end the game
         gameOver = true;
+
+        // hide the in-game text
+        WhitePlayerText.gameObject.SetActive(false);
+        BlackPlayerText.gameObject.SetActive(false);
+        CheckText.gameObject.SetActive(false);
+
+
+        // unhide all of the game over text
         WinnerText.gameObject.SetActive(true);
-        WinnerText.text = playerWinner.ToUpper() + " Is\nThe Winner!";
         RestartText.gameObject.SetActive(true);
+
+        // show the winner
+        WinnerText.text = $"<color=#dd61ff>{playerWinner.ToUpper()}</color> Is\nThe Winner!";
     }
 
 }
